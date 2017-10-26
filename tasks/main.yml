@@ -1,0 +1,36 @@
+---
+
+- name: Centreon | Hostgroup
+  become: False
+  centreon_hostgroup:
+    url: "{{ centreon_api_url }}"
+    username: "{{ centreon_api_user }}"
+    password: "{{ centreon_api_pass }}"
+    hg: "{{ centreon_hostgroups }}"
+  when: centreon_hostgroups is defined
+  delegate_to: "{{ centreon_delegate_to }}"
+  run_once: True
+
+- name: Centreon | Host
+  become: False
+  centreon_host:
+    url: "{{ centreon_api_url }}"
+    username: "{{ centreon_api_user }}"
+    password: "{{ centreon_api_pass }}"
+    name: "{{ centreon_host_hostname | default(ansible_hostname) }}"
+    alias: "{{ centreon_host_alias | default(ansible_fqdn) }}"
+    ipaddr: "{{ centreon_host_ipaddr | default(monitoring_ip) | default(ansible_default_ipv4.address)}}"
+    hosttemplates: "{{ centreon_host_hosttemplates | default(centreon_host_hosttemplates_default) }}"
+    hostgroups: "{{ centreon_host_hostgroups | default(omit) }}"
+    instance: "{{ centreon_poller }}"
+    status: "{{ centreon_host_status | default(omit)}}"
+    state: "{{ centreon_host_state | default(omit) }}"
+    params: "{{ centreon_host_params | default(omit) }}"
+    macros: "{{ centreon_host_macros | default(omit) }}"
+    applycfg: "{{ centreon_applycfg | default(False) }}"
+  delegate_to: "{{ centreon_delegate_to }}"
+  notify: "centreon api applycfg"
+
+- include: mount.yml
+  when: centreon_host_disk_detection
+

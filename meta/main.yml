@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Guillaume Watteeux
+  description: Deploy host to Centreon
+  license: Apache
+  min_ansible_version: 2.2
+  platforms:
+  - name: Ubuntu
+    versions:
+    - all
+  - name: Debian
+    versions:
+    - jessie
+    - sid
+    - stretch
+  galaxy_tags:
+    - centreon
+    - monitoring

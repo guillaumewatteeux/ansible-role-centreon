@@ -1,0 +1,48 @@
+---
+
+#
+# Module properties
+#
+# By default, link hostTemplate with mountpoint detected with ansible_facts
+# Use ansible_mount
+centreon_host_disk_detection: True
+
+#
+# Centreon API informations
+#
+#centreon_api_url:
+#centreon_api_user:
+#centreon_api_pass:
+
+# By default, use localhost for centreon API connexions
+centreon_delegate_to: localhost
+
+#
+# HostGroup properties
+#
+#centreon_hostgroup:
+
+#
+# Host properties
+#
+#centreon_host_name:
+#centreon_host_alias:
+#centreon_host_ipaddr:
+centreon_host_hosttemplates:
+  - OS-Linux-SNMP-custom
+centreon_host_hostgroups:
+  - Linux-Servers
+centreon_poller: Central
+
+# For disk detection, contact this value with mountpoint name
+# ansible_mount.mounts = /home
+# -> HostTemplate = OS-Linux-SNMP-Disk-/home
+centreon_disk_hosttemplates_prefix: "OS-Linux-SNMP-Disk"
+
+centreon_whitelist_fs:
+  - ext4
+  - ext3
+  - ext2
+  - xfs
+
+centreon_blacklist_mounts: []

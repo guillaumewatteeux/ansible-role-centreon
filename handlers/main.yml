@@ -1,0 +1,12 @@
+---
+
+- name: "centreon api applycfg"
+  become: False
+  centreon_poller:
+    url: "{{ centreon_api_url }}"
+    username: "{{ centreon_api_user }}"
+    password: "{{ centreon_api_pass }}"
+    instance: "{{ centreon_poller }}"
+  listen: "centreon api applycfg"
+  delegate_to: "{{ centreon_delegate_to }}"
+  run_once: True
