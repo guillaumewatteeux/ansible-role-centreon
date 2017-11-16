@@ -34,3 +34,7 @@
 - include: mount.yml
   when: centreon_host_disk_detection
 
+- include: network.yml
+  when: centreon_host_network_detection
+  
+

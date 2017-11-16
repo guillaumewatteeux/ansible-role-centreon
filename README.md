@@ -5,8 +5,10 @@ Ansible [Centreon](http://www.centreon.com) role.
 
 Features:
  * Create / manage host on Centreon instance
- * Deploy service with hostTemplate
- * Deploy service from mountpoint
+ * Deploy service with hostTemplate (previously created)
+ * Discovery:
+   - Deploy service from mountpoint
+   - Deploy service for network interface
 
 Require
 --------
@@ -20,6 +22,7 @@ Role Variables
 --------------
 
 see `defaults/main.yml`
+
 
 Example Playbook
 ----------------

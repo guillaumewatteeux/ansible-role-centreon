@@ -3,9 +3,12 @@
 #
 # Module properties
 #
-# By default, link hostTemplate with mountpoint detected with ansible_facts
-# Use ansible_mount
-centreon_host_disk_detection: True
+# Link hostTemplate with mountpoint detected with ansible_facts
+# Use {{ ansible_mount }}
+centreon_host_disk_detection: False
+# Link hostTempalte with interface detected with ansible_fact
+# Use ansible_interfaces
+centreon_host_network_detection: False
 
 #
 # Centreon API informations
@@ -28,13 +31,14 @@ centreon_delegate_to: localhost
 #centreon_host_name:
 #centreon_host_alias:
 #centreon_host_ipaddr:
+# Default HostTemplate (see Centreon IMP)
 centreon_host_hosttemplates:
   - OS-Linux-SNMP-custom
 centreon_host_hostgroups:
   - Linux-Servers
 centreon_poller: Central
 
-# For disk detection, contact this value with mountpoint name
+# For disk detection, concact this value with mountpoint name
 # ansible_mount.mounts = /home
 # -> HostTemplate = OS-Linux-SNMP-Disk-/home
 centreon_disk_hosttemplates_prefix: "OS-Linux-SNMP-Disk"
@@ -46,3 +50,39 @@ centreon_whitelist_fs:
   - xfs
 
 centreon_blacklist_mounts: []
+
+# For network detection, concact this value with interface name
+# ansible_interfaces = eth0
+# -> HostTemplate = OS-Linux-SNMP-Traffic-eth0
+centreon_network_hosttemplates_prefix: "OS-Linux-SNMP-Traffic"
+
+# Remove virtual interface (ex: eth0:2)
+centreon_host_network_filter_virtual: True
+# Remove Vlan interface (ex: eth0.1 for vlanid 1)
+centreon_host_network_filter_vlan: True
+
+# ex:
+# centreon_whitelist_network:
+#   - eth0
+#   - eth3
+#   - tun0
+centreon_whitelist_network: []
+
+# ex:
+# centreon_blacklist_network:
+#   - eth1
+#   - bond0
+centreon_blacklist_network: []
+
+# ex:
+# centreon_whitelist_network_type:
+#   - ether
+#   - tunnel
+centreon_whitelist_network_type: []
+
+# ex:
+# centreon_blacklist_network_type:
+#   - loopback
+#   - tunnel
+centreon_blacklist_network_type:
+  - loopback

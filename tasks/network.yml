@@ -1,0 +1,85 @@
+---
+
+- name: Centreon | Retrieve all network interfaces
+  set_fact:
+    centreon_list_all_interfaces: "{{ ansible_interfaces | map('replace', '-','_') | list }}"
+  when: >
+    centreon_host_network_detection
+
+- name: Centreon | Filter interface list (virtual)
+  set_fact:
+    centreon_list_all_interfaces: |
+      {{ centreon_list_all_interfaces | map('regex_replace','_.*','') | list | unique }}
+  when: centreon_host_network_filter_virtual
+
+- name: Centreon | Filter interface list (vlan)
+  set_fact:
+    centreon_list_all_interfaces: |
+      {{ centreon_list_all_interfaces | map('regex_replace', '\..*', '' ) | list | unique }}
+  when: centreon_host_network_filter_vlan
+
+- name: Centreon | Filter interface list (whitelist)
+  set_fact:
+    centreon_list_all_interfaces: |
+      {{ centreon_list_all_interfaces | intersect(centreon_whitelist_network) | list }}
+  with_items: "{{ centreon_list_all_interfaces }}"
+  when: >
+    centreon_whitelist_network and centreon_whitelist_network is defined
+
+- name: Centreon | Filter interface list (blacklist)
+  set_fact:
+    centreon_list_all_interfaces: |
+      {{ centreon_list_all_interfaces | difference(centreon_blacklist_network) | list }}
+  with_items: "{{ centreon_list_all_interfaces }}"
+  when: >
+    centreon_blacklist_network and centreon_blacklist_network is defined
+
+- name: Centreon | Filter interface list (whitelist_type) 1/2
+  set_fact:
+    _centreon_list_all_interfaces_type: |
+      {{ _centreon_list_all_interfaces_type | default([]) }} + {{ [item] }}
+  with_items: "{{ centreon_list_all_interfaces }}"
+  when: >
+    centreon_whitelist_network_type and centreon_whitelist_network_type is defined
+    and hostvars[inventory_hostname]['ansible_%s' | format(item)]['type'] in centreon_whitelist_network_type
+
+- name: Centreon | Filter interface list (whitelist_type) 2/2
+  set_fact:
+    centreon_list_all_interfaces: |
+      {{ _centreon_list_all_interfaces_type }}
+  when:  _centreon_list_all_interfaces_type is defined
+
+- name: Centreon | Filter interface list (blacklist_type) 1/2
+  set_fact:
+    _centreon_list_all_interfaces_type_bl: |
+      {{ _centreon_list_all_interfaces_type_bl | default([]) }} + {{ [item] }}
+  with_items: "{{ centreon_list_all_interfaces }}"
+  when: >
+    centreon_blacklist_network_type and centreon_blacklist_network_type is defined
+    and hostvars[inventory_hostname]['ansible_%s' | format(item)]['type'] not in centreon_blacklist_network_type
+
+- name: Centreon | Filter interface list (blacklist_type) 2/2
+  set_fact:
+    centreon_list_all_interfaces: |
+      {{_centreon_list_all_interfaces_type_bl }}
+  when: _centreon_list_all_interfaces_type_bl is defined
+
+- name: Centreon | Filter active interface
+  set_fact:
+    centreon_network_hosttemplate: |
+      {{ centreon_network_hosttemplate | default([]) | union([centreon_network_hosttemplates_prefix + '-' + item]) }}
+  with_items: "{{ centreon_list_all_interfaces }}"
+  when: >
+    hostvars[inventory_hostname]['ansible_%s' | format(item)]['active']
+
+- name: Centreon | Add network monitoring
+  become: False
+  centreon_host:
+    url: "{{ centreon_api_url }}"
+    username: "{{ centreon_api_user }}"
+    password: "{{ centreon_api_pass }}"
+    name: "{{ centreon_host_hostname | default(ansible_hostname) }}"
+    hosttemplates: "{{ centreon_network_hosttemplate }}"
+    applycfg: "{{ centreon_applycfg | default(False) }}"
+  delegate_to: "{{ centreon_delegate_to }}"
+  notify: "centreon api applycfg"
