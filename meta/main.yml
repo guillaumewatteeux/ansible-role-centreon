@@ -13,6 +13,10 @@ galaxy_info:
     - jessie
     - sid
     - stretch
+  - name: EL
+    versions:
+    - 6
+    - 7
   galaxy_tags:
     - centreon
     - monitoring
