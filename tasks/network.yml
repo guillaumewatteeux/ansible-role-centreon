@@ -40,7 +40,7 @@
       {{ _centreon_list_all_interfaces_type | default([]) }} + {{ [item] }}
   with_items: "{{ centreon_list_all_interfaces }}"
   when: >
-    centreon_whitelist_network_type and centreon_whitelist_network_type is defined
+    centreon_whitelist_network_type is defined and centreon_whitelist_network_type
     and hostvars[inventory_hostname]['ansible_%s' | format(item)]['type'] in centreon_whitelist_network_type
 
 - name: Centreon | Filter interface list (whitelist_type) 2/2
@@ -55,7 +55,7 @@
       {{ _centreon_list_all_interfaces_type_bl | default([]) }} + {{ [item] }}
   with_items: "{{ centreon_list_all_interfaces }}"
   when: >
-    centreon_blacklist_network_type and centreon_blacklist_network_type is defined
+    centreon_blacklist_network_type is defined and centreon_blacklist_network_type
     and hostvars[inventory_hostname]['ansible_%s' | format(item)]['type'] not in centreon_blacklist_network_type
 
 - name: Centreon | Filter interface list (blacklist_type) 2/2
